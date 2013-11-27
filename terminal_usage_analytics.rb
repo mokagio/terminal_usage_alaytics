@@ -1,12 +1,19 @@
-# remember to run `rm -rf git_log; fc -R; fc -l -n -d -E -NUMBER > git_log`
-# in ZSH to 
-log_file = "git_log"
+# Script to get insights on the commands used in the terminal
+if not ARGV[0]
+  puts "No path to zsh histroy file given.\nTerminating."
+  exit
+end
+
+if not File.exists? ARGV[0]
+  puts "History file at path #{ARGV[0]} does not exist.\nTerminating."
+  exit
+end
 
 puts "Running analytics..."
 
 commands = []
 
-File.read(log_file).lines.each do |line|
+File.read(ARGV[0]).lines.each do |line|
 	# strip the timestamp
   # no big checks, let's jsut rely on the fact the format is 
   #13.11.2013 00:05 command
