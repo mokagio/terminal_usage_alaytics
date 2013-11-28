@@ -1,4 +1,14 @@
 # Script to get insights on the commands used in the terminal
+
+def parse_zsh_histfile_line(line)
+  # line format
+  # : 1385080058:0;command --option argument
+  {
+    :timestamp => line.split(":")[1][1..-1], 
+    :full_command => line[(line.index(";") + 1)..-1].chomp
+  }
+end
+
 if not ARGV[0]
   puts "No path to zsh histroy file given.\nTerminating."
   exit
@@ -14,13 +24,12 @@ puts "Running analytics..."
 commands = []
 
 File.read(ARGV[0]).lines.each do |line|
-	# strip the timestamp
-  # no big checks, let's jsut rely on the fact the format is 
-  #13.11.2013 00:05 command
-  command_line = line[17,100000000].chomp # dirtiest way to get the substring
+  parsed_line = parse_zsh_histfile_line line
+  command_line = parsed_line[:full_command]
 
+  # TODO find a better way to strip initial whitespace!
   while command_line[0] == " "
-    command_line = command_line[1,100000000000]
+    command_line = command_line[1,-1]
   end
 
   found = false
