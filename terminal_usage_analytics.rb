@@ -7,7 +7,7 @@ def parse_zsh_histfile_line(line)
 
   {
     :timestamp => line.split(":")[1][1..-1], 
-    :full_command => line[(line.index(";") + 1)..-1].chomp
+    :full_command => line[(line.index(";") + 1)..-1].chomp.lstrip
   }
 end
 
@@ -30,11 +30,6 @@ File.read(ARGV[0]).lines.each do |line|
 
   if parsed_line
     command_line = parsed_line[:full_command]
-
-    # TODO find a better way to strip initial whitespace!
-    while command_line[0] == " "
-      command_line = command_line[1,-1]
-    end
 
     found = false
     for command in commands
