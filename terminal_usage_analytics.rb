@@ -3,6 +3,8 @@
 def parse_zsh_histfile_line(line)
   # line format
   # : 1385080058:0;command --option argument
+  return nil if line[0] != ":"
+
   {
     :timestamp => line.split(":")[1][1..-1], 
     :full_command => line[(line.index(";") + 1)..-1].chomp
@@ -25,23 +27,26 @@ commands = []
 
 File.read(ARGV[0]).lines.each do |line|
   parsed_line = parse_zsh_histfile_line line
-  command_line = parsed_line[:full_command]
 
-  # TODO find a better way to strip initial whitespace!
-  while command_line[0] == " "
-    command_line = command_line[1,-1]
-  end
+  if parsed_line
+    command_line = parsed_line[:full_command]
 
-  found = false
-  for command in commands
-    if command[:command] == command_line
-      found = true
-      command[:count] += 1
-      break
+    # TODO find a better way to strip initial whitespace!
+    while command_line[0] == " "
+      command_line = command_line[1,-1]
     end
-  end
-  if not found
-    commands.push({ :command => command_line, :count => 1 })
+
+    found = false
+    for command in commands
+      if command[:command] == command_line
+        found = true
+        command[:count] += 1
+        break
+      end
+    end
+    if not found
+      commands.push({ :command => command_line, :count => 1 })
+    end
   end
 end
 
