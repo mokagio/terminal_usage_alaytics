@@ -48,7 +48,7 @@ end
 # compress commands that differs only for their only a string parameter
 puts "Compressing commands..."
 
-compressed_commands = []
+commands_by_first_word = []
 for c in commands
   # puts "\nAnalysing command #{c}"
 
@@ -59,35 +59,35 @@ for c in commands
     # if first_argument[0] == "'" or first_argument[0] == '"'
       
     found = false
-    for c_command in compressed_commands
-      # puts "\t.....#{c_command[:command]} - #{c[:command].split(' ')[0]}"
-      if c_command[:command] == c[:command].split(' ')[0]
+    for already_found in commands_by_first_word
+      # puts "\t.....#{already_found[:command]} - #{c[:command].split(' ')[0]}"
+      if already_found[:command] == c[:command].split(' ')[0]
         found = true
-        c_command[:count] += 1
+        already_found[:count] += c[:count]
         break
       end
     end
 
     # puts "should push? #{found}"
     if not found
-      hash = { :command => c[:command].split(' ')[0], :count => 1 }
-      # puts "pushing #{hash} in compressed_commands"
-      compressed_commands.push hash
+      hash = { :command => c[:command].split(' ')[0], :count => c[:count] }
+      # puts "pushing #{hash} in commands_by_first_word"
+      commands_by_first_word.push hash
     end
 
   else
-    # puts "pushing #{c} in compressed_commands"
-    compressed_commands.push c
+    # puts "pushing #{c} in commands_by_first_word"
+    commands_by_first_word.push c
   end
 end
 
 cnt = 0
-for c in compressed_commands
+for c in commands_by_first_word
   cnt += c[:count]
 end
 
 # puts "\n#{cnt}\n"
-sorted_commands = compressed_commands.sort { |x,y| y[:count] <=> x[:count] }
+sorted_commands = commands_by_first_word.sort { |x,y| y[:count] <=> x[:count] }
 
 puts "\nCommands Stats\n(skipping the ones used only once or twice, because of the three strokes and then automate rule)\n"
 for command in sorted_commands
