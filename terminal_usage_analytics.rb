@@ -1,5 +1,7 @@
 # Script to get insights on the commands used in the terminal
 
+require 'json'
+
 def sputs(message)
   puts message unless true
 end
@@ -27,6 +29,7 @@ end
 
 sputs "Running analytics..."
 
+json_output = {}
 commands = []
 
 File.read(ARGV[0]).lines.each do |line|
@@ -100,10 +103,13 @@ for command in sorted_commands
   end
 end
 
-sputs "\nAnalysing top 10 commands looking for patterns"
+json_output['sorted_commands'] = sorted_commands
+
+json_output['sorted_commands_by_first_argument'] = []
+#sputs "\nAnalysing top 10 commands looking for patterns"
 sputs "- looking for patters on the first command argument"
 commands_with_first_argument = []
-for command in sorted_commands[0,19]
+for command in sorted_commands#[0,19]
   sputs "\tlooking for patterns for command #{command[:command]}"
   first_arguments = []
   # 1. get all the matching commands in the history
@@ -126,6 +132,9 @@ for command in sorted_commands[0,19]
       first_arguments.push hash if not found
     end
   end
+
+  json_output['sorted_commands_by_first_argument'].push first_arguments
+
   sputs "\tfound #{first_arguments.length} for #{command[:command]} (showing > 3 invocations)" 
   for argument in first_arguments.sort { |x,y| y[:count] <=> x[:count] }
     sputs "\t\t#{argument[:count]} - #{command[:command]} #{argument[:argument]}" unless argument[:count] < 3
